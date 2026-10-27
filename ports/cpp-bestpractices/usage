@@ -6,6 +6,11 @@ To use it, add the following to your CMakeLists.txt:
     find_package(cpp-bestpractices CONFIG REQUIRED)
     target_link_libraries(my-target PRIVATE cpp-bestpractices::cpp-bestpractices)
 
+Or use this to apply best-practices to all targets defined after:
+
+    find_package(cpp-bestpractices CONFIG REQUIRED)
+    link_libraries(cpp-bestpractices::cpp-bestpractices)
+
 Replace `my-target` with the name of your target (e.g., your executable or library).
 This will apply flags like -Wall, -Wextra, -Wpedantic (for GCC/Clang)
 or /W4 (for MSVC) to your target.
