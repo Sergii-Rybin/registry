@@ -1,3 +1,5 @@
+# Header-only port: skip redundant debug build configuration since no binaries are compiled
+set(VCPKG_BUILD_TYPE release)
 
 set(VCPKG_USE_HEAD_VERSION ON)
 
