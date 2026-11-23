@@ -1,6 +1,6 @@
 {
   "name": "cpp-bestpractices",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A virtual package to enforce C++ best practices through compiler warnings.",
   "dependencies": [
     {
@@ -11,5 +11,10 @@
       "name": "vcpkg-cmake-config",
       "host": true
     }
-  ]
+  ],
+  "features": {
+    "skills": {
+      "description": "Install AI agent skill and auto-register vcpkg agent skills into .agents/skills.json."
+    }
+  }
 }

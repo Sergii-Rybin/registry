@@ -20,3 +20,7 @@ Example usage in CMakeLists.txt:
         $<$<BOOL:${WARNINGS_AS_ERRORS}>:cpp-bestpractices::werror>
         $<$<BOOL:${ENABLE_SANITIZERS}>:cpp-bestpractices::asan>
     )
+
+Optional vcpkg feature:
+    Enable "features": ["skills"] in vcpkg.json to install the AI agent skill
+    and automatically register vcpkg agent skills into .agents/skills.json.
