@@ -1,5 +1,29 @@
 include("${CMAKE_CURRENT_LIST_DIR}/cpp-bestpractices-targets.cmake")
 
+function(cpp_bestpractices_enable_ccache)
+    if(NOT CMAKE_GENERATOR MATCHES "Ninja|Makefiles")
+        message(STATUS "ccache skipped: unsupported generator (${CMAKE_GENERATOR})")
+        return()
+    endif()
+
+    find_program(CCACHE_PROGRAM ccache)
+    if(NOT CCACHE_PROGRAM)
+        message(WARNING "ccache not found; proceeding with default compiler.")
+        return()
+    endif()
+
+    set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}" PARENT_SCOPE)
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}" PARENT_SCOPE)
+
+    # MSVC defaults to /Zi (shared .pdb via mspdbsrv.exe), which bypasses ccache.
+    # Switch to Embedded (/Z7) so debug info is stored inside .obj files.
+    if(MSVC)
+        set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug,RelWithDebInfo>:Embedded>" PARENT_SCOPE)
+    endif()
+
+    message(STATUS "ccache enabled: ${CCACHE_PROGRAM}")
+endfunction()
+
 function(cpp_bestpractices_add_format_targets)
     find_program(CLANG_FORMAT_BIN clang-format)
     if(NOT CLANG_FORMAT_BIN)

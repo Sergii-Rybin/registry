@@ -13,6 +13,7 @@ Available targets:
 Example usage in CMakeLists.txt:
 
     find_package(cpp-bestpractices CONFIG REQUIRED)
+    cpp_bestpractices_enable_ccache()
 
     target_link_libraries(my-target PRIVATE
         cpp-bestpractices::cpp-bestpractices

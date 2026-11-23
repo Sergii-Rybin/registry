@@ -25,6 +25,7 @@ Always link targets `PRIVATE` to avoid leaking warning flags into external consu
 
 ```cmake
 find_package(cpp-bestpractices CONFIG REQUIRED)
+cpp_bestpractices_enable_ccache()
 
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 option(ENABLE_SANITIZERS "Enable Address & UB Sanitizers" OFF)

@@ -1,6 +1,6 @@
 {
   "name": "cpp-bestpractices",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "A virtual package to enforce C++ best practices through compiler warnings.",
   "dependencies": [
     {
