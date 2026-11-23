@@ -1,5 +1,22 @@
 {
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "overloaded",
-  "version": "1.0.0",
-  "description": "A header-only library with well-known overloaded template function."
+  "version": "1.1.0",
+  "description": "A header-only library with well-known overloaded template function.",
+  "license": null,
+  "dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ],
+  "features": {
+    "skills": {
+      "description": "Install AI agent skill into share/agent-skills/overloaded."
+    }
+  }
 }

@@ -16,6 +16,8 @@ file(INSTALL
     DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}"
 )
 
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")
+
 if("skills" IN_LIST FEATURES)
     file(INSTALL
         "${SOURCE_PATH}/vcpkg-cmake-wrapper.cmake"
