@@ -39,4 +39,7 @@ target_link_libraries(my_core_lib PRIVATE
 target_link_libraries(my_tests PRIVATE
     cpp-bestpractices::lite
 )
+
+# Register `format` and `format-check` targets (collects SOURCES, HEADER_SET, CXX_MODULE_SET)
+cpp_bestpractices_add_format_targets(my_core_lib my_tests)
 ```

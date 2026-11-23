@@ -141,10 +141,14 @@ install(TARGETS
     hardening
     asan
     tsan
-    EXPORT cpp-bestpractices-config
+    EXPORT cpp-bestpractices-targets
 )
 
-install(EXPORT cpp-bestpractices-config
+install(EXPORT cpp-bestpractices-targets
     DESTINATION share/cpp-bestpractices
     NAMESPACE cpp-bestpractices::
+)
+
+install(FILES cpp-bestpractices-config.cmake
+    DESTINATION share/cpp-bestpractices
 )
