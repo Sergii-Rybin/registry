@@ -4,7 +4,7 @@ Personal [vcpkg](https://github.com/microsoft/vcpkg) git registry containing reu
 
 ## Available Ports
 
-- **`cpp-bestpractices`** — CMake `INTERFACE` target enforcing strict compiler warnings across GCC, Clang, and MSVC.
+- **`cpp-bestpractices`** — Composable CMake `INTERFACE` targets for compiler warnings (`lite`, `cpp-bestpractices`, `paranoid`, `werror`), STL `hardening`, and sanitizers (`asan`, `tsan`).
 - **`overloaded`** — Header-only implementation of the `overloaded` visitor pattern for `std::variant`.
 
 ## Usage
