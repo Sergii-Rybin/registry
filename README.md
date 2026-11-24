@@ -5,6 +5,7 @@ Personal [vcpkg](https://github.com/microsoft/vcpkg) git registry containing reu
 ## Available Ports
 
 - **`cpp-bestpractices`** — Composable CMake `INTERFACE` targets for compiler warnings (`lite`, `cpp-bestpractices`, `paranoid`, `werror`), STL `hardening`, and sanitizers (`asan`, `tsan`).
+- **`docs-render`** — Inja-powered host CLI tool and CMake helper for rendering documentation with live code snippets, JSON metadata, and verified executable outputs.
 - **`overloaded`** — Header-only implementation of the `overloaded` visitor pattern for `std::variant`.
 
 ## Usage
@@ -26,6 +27,7 @@ Add this registry to your project's `vcpkg-configuration.json`:
       "baseline": "<registry-commit-sha>",
       "packages": [
         "cpp-bestpractices",
+        "docs-render",
         "overloaded"
       ]
     }

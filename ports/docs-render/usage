@@ -1,0 +1,42 @@
+The docs-render port provides an Inja-powered host CLI tool and CMake helper
+to render documentation with live code snippets, optional JSON metadata, and
+verified executable outputs.
+
+Add as a host dependency in vcpkg.json:
+
+    "dependencies": [
+      {
+        "name": "docs-render",
+        "host": true
+      }
+    ]
+
+In-place mode (no .in file needed; updates <!-- inja: ... --> blocks in place):
+
+    find_package(docs-render CONFIG REQUIRED)
+
+    docs_render_add_targets(
+        IN_PLACE README.md
+        TARGETS my-example
+    )
+
+Template mode (renders OUTPUT from TEMPLATE; DATA is optional and only needed
+when referencing JSON metadata such as {{ vcpkg.version }}):
+
+    find_package(docs-render CONFIG REQUIRED)
+
+    docs_render_add_targets(
+        TEMPLATE README.md.in
+        OUTPUT README.md
+        DATA vcpkg=vcpkg.json
+        TARGETS my-example
+        TIMEOUT 15
+    )
+
+Available custom targets:
+    docs-render       - Render documentation (skips write if unchanged)
+    docs-render-check - Fail with exit code 1 if documentation is out of date
+
+Optional vcpkg feature:
+    Enable "features": ["skills"] in vcpkg.json to install the AI agent skill
+    into share/agent-skills/docs-render.
