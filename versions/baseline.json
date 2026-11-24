@@ -2,7 +2,7 @@
   "default": {
     "cpp-bestpractices": {
       "baseline": "1.5.0",
-      "port-version": 0
+      "port-version": 1
     },
     "docs-render": {
       "baseline": "1.1.0",
