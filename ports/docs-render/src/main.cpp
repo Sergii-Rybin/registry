@@ -1,17 +1,6 @@
 #include <inja/inja.hpp>
 #include <nlohmann/json.hpp>
-
-#ifdef _WIN32
-#define NOMINMAX
-#include <windows.h>
-#else
-#include <cerrno>
-#include <csignal>
-#include <fcntl.h>
-#include <poll.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#endif
+#include <subprocess/subprocess.hpp>
 
 import std;
 
@@ -235,262 +224,38 @@ void write_file_binary(const fs::path& path, std::string_view content) {
     return result;
 }
 
-#ifdef _WIN32
-
-[[nodiscard]] std::string quote_win_arg(std::string_view arg) {
-    if (!arg.empty() && arg.find_first_of(" \t\"") == std::string_view::npos) {
-        return std::string(arg);
-    }
-    std::string out = "\"";
-    for (char c : arg) {
-        if (c == '"') {
-            out += "\\\"";
-        } else {
-            out.push_back(c);
-        }
-    }
-    out.push_back('"');
-    return out;
-}
-
 [[nodiscard]] std::string run_process(const std::vector<std::string>& argv, int timeout_seconds) {
-    SECURITY_ATTRIBUTES sa{};
-    sa.nLength = sizeof(sa);
-    sa.bInheritHandle = TRUE;
-
-    HANDLE stdout_read = nullptr;
-    HANDLE stdout_write = nullptr;
-    if (!CreatePipe(&stdout_read, &stdout_write, &sa, 0)) {
-        throw std::runtime_error("CreatePipe failed");
-    }
-    SetHandleInformation(stdout_read, HANDLE_FLAG_INHERIT, 0);
-
-    std::string cmdline;
-    for (std::size_t i = 0; i < argv.size(); ++i) {
-        if (i > 0) {
-            cmdline.push_back(' ');
-        }
-        cmdline += quote_win_arg(argv[i]);
+    if (argv.empty()) {
+        throw std::runtime_error("Empty command for run_process()");
     }
 
-    STARTUPINFOA si{};
-    si.cb = sizeof(si);
-    si.dwFlags = STARTF_USESTDHANDLES;
-    si.hStdOutput = stdout_write;
-    si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
-    si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+    const std::span<const std::string> extra_args = std::span(argv).subspan(1);
+    const auto res = subprocess::run(
+        subprocess::AppName{argv.front()},
+        subprocess::Params{extra_args},
+        subprocess::TimeOut{std::chrono::seconds(timeout_seconds)}
+    );
 
-    PROCESS_INFORMATION pi{};
-    if (!CreateProcessA(
-            nullptr,
-            cmdline.data(),
-            nullptr,
-            nullptr,
-            TRUE,
-            0,
-            nullptr,
-            nullptr,
-            &si,
-            &pi
-        )) {
-        CloseHandle(stdout_read);
-        CloseHandle(stdout_write);
-        throw std::runtime_error(std::format("Failed to launch process: {}", cmdline));
-    }
-    CloseHandle(stdout_write);
-
-    std::string output;
-    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(timeout_seconds);
-    char buf[4096];
-    for (;;) {
-        DWORD avail = 0;
-        if (PeekNamedPipe(stdout_read, nullptr, 0, nullptr, &avail, nullptr) && avail > 0) {
-            DWORD bytes_read = 0;
-            if (ReadFile(stdout_read, buf, sizeof(buf), &bytes_read, nullptr) && bytes_read > 0) {
-                output.append(buf, bytes_read);
-            }
-            continue;
-        }
-        const DWORD wait_rc = WaitForSingleObject(pi.hProcess, 10);
-        if (wait_rc == WAIT_OBJECT_0) {
-            DWORD bytes_read = 0;
-            while (ReadFile(stdout_read, buf, sizeof(buf), &bytes_read, nullptr) && bytes_read > 0) {
-                output.append(buf, bytes_read);
-            }
-            break;
-        }
-        if (std::chrono::steady_clock::now() >= deadline) {
-            TerminateProcess(pi.hProcess, 1);
-            WaitForSingleObject(pi.hProcess, 1000);
-            CloseHandle(stdout_read);
-            CloseHandle(pi.hProcess);
-            CloseHandle(pi.hThread);
-            throw std::runtime_error(std::format("Process timed out after {}s: {}", timeout_seconds, argv[0]));
-        }
+    if (res.timedOut) {
+        throw std::runtime_error(std::format("Process timed out after {}s: {}", timeout_seconds, argv.front()));
     }
 
-    DWORD exit_code = 0;
-    GetExitCodeProcess(pi.hProcess, &exit_code);
-    CloseHandle(stdout_read);
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
-
-    if (exit_code != 0) {
-        throw std::runtime_error(std::format("Process exited with code {}: {}", exit_code, argv[0]));
-    }
-    return rtrim_whitespace(normalize_lf(output));
-}
-
-#else
-
-[[nodiscard]] std::string run_process(const std::vector<std::string>& argv, int timeout_seconds) {
-    int out_pipe[2]{-1, -1};
-    int err_pipe[2]{-1, -1};
-    if (pipe(out_pipe) != 0) {
-        throw std::runtime_error(std::format("pipe() failed: {}", std::strerror(errno)));
-    }
-    if (pipe(err_pipe) != 0) {
-        const int err = errno;
-        close(out_pipe[0]);
-        close(out_pipe[1]);
-        throw std::runtime_error(std::format("pipe() failed: {}", std::strerror(err)));
-    }
-
-    const pid_t pid = fork();
-    if (pid < 0) {
-        const int err = errno;
-        close(out_pipe[0]);
-        close(out_pipe[1]);
-        close(err_pipe[0]);
-        close(err_pipe[1]);
-        throw std::runtime_error(std::format("fork() failed: {}", std::strerror(err)));
-    }
-
-    if (pid == 0) {
-        dup2(out_pipe[1], STDOUT_FILENO);
-        dup2(err_pipe[1], STDERR_FILENO);
-        close(out_pipe[0]);
-        close(out_pipe[1]);
-        close(err_pipe[0]);
-        close(err_pipe[1]);
-
-        std::vector<char*> c_argv;
-        c_argv.reserve(argv.size() + 1);
-        for (const auto& arg : argv) {
-            c_argv.push_back(const_cast<char*>(arg.c_str()));
+    if (res.status != subprocess::TerminationStatus::Exited || res.exitCode != 0) {
+        std::string msg = std::format("Process failed ({})", argv.front());
+        if (res.status == subprocess::TerminationStatus::Exited) {
+            msg += std::format(" with exit code {}", res.exitCode);
+        } else if (res.status == subprocess::TerminationStatus::Signaled) {
+            msg += std::format(" terminated by signal {}", res.signal);
         }
-        c_argv.push_back(nullptr);
-
-        execvp(c_argv[0], c_argv.data());
-        _exit(127);
-    }
-
-    close(out_pipe[1]);
-    close(err_pipe[1]);
-
-    fcntl(out_pipe[0], F_SETFL, O_NONBLOCK);
-    fcntl(err_pipe[0], F_SETFL, O_NONBLOCK);
-
-    std::string stdout_str;
-    std::string stderr_str;
-    bool out_open = true;
-    bool err_open = true;
-    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(timeout_seconds);
-
-    char buf[4096];
-    while (out_open || err_open) {
-        const auto now = std::chrono::steady_clock::now();
-        if (now >= deadline) {
-            kill(pid, SIGKILL);
-            int status = 0;
-            waitpid(pid, &status, 0);
-            close(out_pipe[0]);
-            close(err_pipe[0]);
-            throw std::runtime_error(std::format("Process timed out after {}s: {}", timeout_seconds, argv[0]));
-        }
-
-        const auto remaining_ms = std::chrono::duration_cast<std::chrono::milliseconds>(deadline - now).count();
-        struct pollfd fds[2]{};
-        nfds_t nfds = 0;
-        if (out_open) {
-            fds[nfds].fd = out_pipe[0];
-            fds[nfds].events = POLLIN;
-            ++nfds;
-        }
-        if (err_open) {
-            fds[nfds].fd = err_pipe[0];
-            fds[nfds].events = POLLIN;
-            ++nfds;
-        }
-
-        const int rc = poll(fds, nfds, static_cast<int>(std::min<long long>(remaining_ms, 100)));
-        if (rc < 0) {
-            if (errno == EINTR) {
-                continue;
-            }
-            break;
-        }
-
-        for (nfds_t i = 0; i < nfds; ++i) {
-            if ((fds[i].revents & (POLLIN | POLLHUP | POLLERR)) == 0) {
-                continue;
-            }
-            const bool is_out = (fds[i].fd == out_pipe[0]);
-            for (;;) {
-                const ssize_t n = read(fds[i].fd, buf, sizeof(buf));
-                if (n > 0) {
-                    if (is_out) {
-                        stdout_str.append(buf, static_cast<std::size_t>(n));
-                    } else {
-                        stderr_str.append(buf, static_cast<std::size_t>(n));
-                    }
-                } else if (n == 0) {
-                    if (is_out) {
-                        out_open = false;
-                    } else {
-                        err_open = false;
-                    }
-                    break;
-                } else {
-                    if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                        break;
-                    }
-                    if (is_out) {
-                        out_open = false;
-                    } else {
-                        err_open = false;
-                    }
-                    break;
-                }
-            }
-        }
-    }
-
-    close(out_pipe[0]);
-    close(err_pipe[0]);
-
-    int status = 0;
-    while (waitpid(pid, &status, 0) < 0 && errno == EINTR) {
-    }
-
-    if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-        std::string msg = std::format("Process failed ({})", argv[0]);
-        if (WIFEXITED(status)) {
-            msg += std::format(" with exit code {}", WEXITSTATUS(status));
-        } else if (WIFSIGNALED(status)) {
-            msg += std::format(" terminated by signal {}", WTERMSIG(status));
-        }
-        const auto err_trimmed = rtrim_whitespace(normalize_lf(stderr_str));
+        const auto err_trimmed = rtrim_whitespace(normalize_lf(res.stdErr));
         if (!err_trimmed.empty()) {
             msg += std::format(": {}", err_trimmed);
         }
         throw std::runtime_error(msg);
     }
 
-    return rtrim_whitespace(normalize_lf(stdout_str));
+    return rtrim_whitespace(normalize_lf(res.stdOut));
 }
-
-#endif
 
 struct InPlaceMarker {
     std::string lang;

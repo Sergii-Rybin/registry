@@ -1,12 +1,13 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "docs-render",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Inja-powered documentation renderer for live code snippets, JSON metadata, and verified executable outputs.",
   "license": null,
   "dependencies": [
     "inja",
     "nlohmann-json",
+    "subprocess",
     {
       "name": "vcpkg-cmake",
       "host": true

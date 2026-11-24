@@ -1,0 +1,12 @@
+The subprocess port provides a modern C++23 cross-platform subprocess library
+for Linux and Windows (supporting both `#include <subprocess/subprocess.hpp>` and
+`import subprocess;`).
+
+To use it, add the following to your CMakeLists.txt:
+
+    find_package(subprocess CONFIG REQUIRED)
+    target_link_libraries(my-target PRIVATE subprocess::subprocess)
+
+Optional vcpkg features:
+    modules (enabled by default) - Build and install the C++23 module interface.
+    skills                       - Install AI agent skill into share/agent-skills/subprocess.

@@ -6,7 +6,7 @@ if(CMAKE_VERSION VERSION_LESS 4.5)
     set(CMAKE_CXX_MODULE_STD ON)
 endif()
 
-project(docs-render VERSION 1.0.0 LANGUAGES CXX)
+project(docs-render VERSION 1.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -14,11 +14,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(inja CONFIG REQUIRED)
+find_package(subprocess CONFIG REQUIRED)
 
 add_executable(docs-render src/main.cpp)
 target_link_libraries(docs-render PRIVATE
     pantor::inja
     nlohmann_json::nlohmann_json
+    subprocess::subprocess
 )
 
 if(MSVC)

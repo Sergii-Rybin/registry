@@ -1,0 +1,29 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "subprocess",
+  "version": "1.0.0",
+  "description": "Modern C++23 cross-platform subprocess library for Linux and Windows.",
+  "homepage": "https://github.com/Sergii-Rybin/subprocess",
+  "license": null,
+  "dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ],
+  "default-features": [
+    "modules"
+  ],
+  "features": {
+    "modules": {
+      "description": "Build and install the C++23 module interface (`import subprocess;`)."
+    },
+    "skills": {
+      "description": "Install AI agent skill for subprocess into share/agent-skills/subprocess."
+    }
+  }
+}
