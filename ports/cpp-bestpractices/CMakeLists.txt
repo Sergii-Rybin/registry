@@ -149,6 +149,8 @@ install(EXPORT cpp-bestpractices-targets
     NAMESPACE cpp-bestpractices::
 )
 
-install(FILES cpp-bestpractices-config.cmake
+install(FILES
+    cpp-bestpractices-config.cmake
+    sync-docs.cmake
     DESTINATION share/cpp-bestpractices
 )

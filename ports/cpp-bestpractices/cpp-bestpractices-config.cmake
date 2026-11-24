@@ -62,3 +62,38 @@ function(cpp_bestpractices_add_format_targets)
         VERBATIM
     )
 endfunction()
+
+function(cpp_bestpractices_add_docs_targets)
+    cmake_parse_arguments(ARG "" "TIMEOUT" "FILES;TARGETS" ${ARGN})
+
+    if(NOT ARG_FILES)
+        message(FATAL_ERROR "cpp_bestpractices_add_docs_targets: FILES is required")
+    endif()
+
+    set(exec_timeout 15)
+    if(ARG_TIMEOUT)
+        set(exec_timeout "${ARG_TIMEOUT}")
+    endif()
+
+    set(target_map "")
+    foreach(tgt IN LISTS ARG_TARGETS)
+        list(APPEND target_map "${tgt}=$<TARGET_FILE:${tgt}>")
+    endforeach()
+
+    foreach(mode IN ITEMS sync check)
+        set(check_only "$<STREQUAL:${mode},check>")
+        add_custom_target("docs-${mode}"
+            COMMAND "${CMAKE_COMMAND}"
+                -D "SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
+                -D "FILES=${ARG_FILES}"
+                -D "TARGET_MAP=${target_map}"
+                -D "EMULATOR=${CMAKE_CROSSCOMPILING_EMULATOR}"
+                -D "EXEC_TIMEOUT=${exec_timeout}"
+                -D "CHECK_ONLY=${check_only}"
+                -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/sync-docs.cmake"
+            DEPENDS ${ARG_TARGETS}
+            COMMENT "Docs (${mode}): syncing code snippets and executable outputs..."
+            VERBATIM
+        )
+    endforeach()
+endfunction()

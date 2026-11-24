@@ -23,6 +23,7 @@ Example usage in CMakeLists.txt:
     )
 
     cpp_bestpractices_add_format_targets(my-target my-tests)
+    cpp_bestpractices_add_docs_targets(FILES README.md TARGETS my-example)
 
 Optional vcpkg feature:
     Enable "features": ["skills"] in vcpkg.json to install the AI agent skill
