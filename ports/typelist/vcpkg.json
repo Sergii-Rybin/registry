@@ -1,0 +1,26 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "typelist",
+  "version": "1.0.0",
+  "description": "Canonical C++23 module typelist library with optional C++26 reflection variant.",
+  "homepage": "https://github.com/Sergii-Rybin/typelist",
+  "license": null,
+  "dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ],
+  "features": {
+    "reflection": {
+      "description": "Build and install the C++26 reflection module (typelist.reflect)."
+    },
+    "skills": {
+      "description": "Install AI agent skill for typelist into share/agent-skills/typelist."
+    }
+  }
+}
