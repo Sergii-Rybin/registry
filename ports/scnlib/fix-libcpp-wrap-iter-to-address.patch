@@ -1,0 +1,17 @@
+diff --git a/include/scn/scan.h b/include/scn/scan.h
+index 8e458e2..b8a74e1 100644
+--- a/include/scn/scan.h
++++ b/include/scn/scan.h
+@@ -240,7 +240,11 @@ template <typename Elem>
+ struct wrapped_pointer_iterator<std::__wrap_iter<Elem*>> {
+     SCN_FORCE_INLINE static constexpr auto to_address(
+         const std::__wrap_iter<Elem*>& it) noexcept
+     {
++#if defined(__cpp_lib_to_address) || (defined(__cplusplus) && __cplusplus >= 202002L)
++        return std::to_address(it);
++#else
+         return it.base();
++#endif
+     }
+ };
+ #endif
