@@ -9,6 +9,8 @@ index 8e458e2..b8a74e1 100644
      {
 +#if defined(__cpp_lib_to_address) || (defined(__cplusplus) && __cplusplus >= 202002L)
 +        return std::to_address(it);
++#elif SCN_STDLIB_LIBCPP
++        return std::__to_address(it);
 +#else
          return it.base();
 +#endif
