@@ -12,6 +12,10 @@
       "baseline": "1.1.0",
       "port-version": 0
     },
+    "pulse": {
+      "baseline": "0.1.0",
+      "port-version": 0
+    },
     "subprocess": {
       "baseline": "1.0.0",
       "port-version": 0

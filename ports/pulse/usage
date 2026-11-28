@@ -1,0 +1,11 @@
+The pulse port provides a header-only C++23 compile-time type-routed signals
+library (`#include <pulse/pulse.hpp>`), with an optional C++26 reflection
+layer (`#include <pulse/pulse_meta.hpp>`).
+
+To use it, add the following to your CMakeLists.txt:
+
+    find_package(pulse CONFIG REQUIRED)
+    target_link_libraries(my-target PRIVATE pulse::pulse)
+
+Optional vcpkg features:
+    skills - Install AI agent skill into share/agent-skills/pulse.
