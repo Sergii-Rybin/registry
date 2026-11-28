@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "cpp-bestpractices",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "A virtual package to enforce C++ best practices through compiler warnings.",
   "license": null,
   "dependencies": [
