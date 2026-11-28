@@ -1,9 +1,6 @@
-diff --git a/include/scn/scan.h b/include/scn/scan.h
-index 8e458e2..b8a74e1 100644
---- a/include/scn/scan.h
-+++ b/include/scn/scan.h
-@@ -240,7 +240,11 @@ template <typename Elem>
- struct wrapped_pointer_iterator<std::__wrap_iter<Elem*>> {
+--- a/include/scn/scan.h	2026-11-28 17:57:44.664167435 +0000
++++ b/include/scn/scan.h	2026-11-28 17:57:44.684520602 +0000
+@@ -240,7 +240,13 @@
      SCN_FORCE_INLINE static constexpr auto to_address(
          const std::__wrap_iter<Elem*>& it) noexcept
      {
