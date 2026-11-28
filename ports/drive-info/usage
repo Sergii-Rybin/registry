@@ -1,0 +1,6 @@
+The drive-info port provides a cross-platform C++23 library for drive discovery, metadata enrichment, S.M.A.R.T., and hot-plug monitoring (`#include <drive_info/drive_info.hpp>`).
+
+To use it, add the following to your CMakeLists.txt:
+
+    find_package(drive_info CONFIG REQUIRED)
+    target_link_libraries(my-target PRIVATE drive_info::drive_info)

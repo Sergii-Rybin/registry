@@ -8,6 +8,14 @@
       "baseline": "1.1.0",
       "port-version": 0
     },
+    "drive-info": {
+      "baseline": "0.1.0",
+      "port-version": 0
+    },
+    "mm": {
+      "baseline": "0.1.0",
+      "port-version": 0
+    },
     "overloaded": {
       "baseline": "1.1.0",
       "port-version": 0

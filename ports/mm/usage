@@ -1,0 +1,6 @@
+The mm port provides the Modern C++23 Memory-Mapped Files library (`#include <mm/mm.hpp>`).
+
+To use it, add the following to your CMakeLists.txt:
+
+    find_package(mm CONFIG REQUIRED)
+    target_link_libraries(my-target PRIVATE MM::mm)

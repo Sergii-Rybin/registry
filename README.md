@@ -10,6 +10,8 @@ Personal [vcpkg](https://github.com/microsoft/vcpkg) git registry containing reu
 - **`typelist`** — Canonical C++23 module typelist library with optional C++26 reflection variant (`typelist.reflect`).
 - **`pulse`** — Header-only C++23 compile-time type-routed signals library with optional C++26 static reflection layer (`pulse_meta.hpp`).
 - **`overloaded`** — Header-only implementation of the `overloaded` visitor pattern for `std::variant`.
+- **`mm`** — Modern C++23 memory-mapped files library (`MM::mm`).
+- **`drive-info`** — Cross-platform C++23 library for drive discovery, partition UIDs, encryption, S.M.A.R.T., and hot-plug monitoring (`drive_info::drive_info`).
 
 ## Usage
 

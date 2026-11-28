@@ -1,0 +1,19 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "mm",
+  "version-semver": "0.1.0",
+  "description": "Modern C++23 Memory-Mapped Files library",
+  "homepage": "https://github.com/Sergii-Rybin/memory-mapping",
+  "license": null,
+  "dependencies": [
+    "mdspan",
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ]
+}
